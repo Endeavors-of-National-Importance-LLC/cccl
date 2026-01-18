@@ -14,33 +14,33 @@ The CUDA Core Compute Libraries provide set of macros to enable or disable speci
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 | CCCL_DISABLE_ARCH_DEPENDENT_NAMESPACE             | ???                                                                                                                +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_BF16_SUPPORT                         | Disables support for ``__nv_bfloat16`` type.                                                                       +
+| CCCL_DISABLE_BF16_SUPPORT                         | Disables use and library support for ``__nv_bfloat16`` type.                                                                       +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_CDP                                  | Disables CUDA Dynamic Parallelism.                                                                                 +
+| CCCL_DISABLE_CDP                                  | Disables use of CUDA Dynamic Parallelism.                                                                          +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 | CCCL_DISABLE_CTK_COMPATIBILITY_CHECK              | Disables the check whether NVCC version matches the CUDA Toolkit version.                                          +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_DEVICE_RUNTIME                       | Disables CUDA device runtime APIs (``<cuda_device_runtime.h>``).                                                   +
+| CCCL_DISABLE_DEVICE_RUNTIME                       | Disables use of CUDA device runtime APIs (``<cuda_device_runtime.h>``), thus makes some APIs that are ``__host__ __device__`` to be ``__host__`` only. +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_DLPACK                               | Disables inclusion of DLPack.                                                                                      +
+| CCCL_DISABLE_DLPACK                               | Disables inclusion of DLPack header and APIs.                                                                      +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_EXCEPTIONS                           | Disables exceptions.                                                                                               +
+| CCCL_DISABLE_EXCEPTIONS                           | Disables throwing exceptions. Each ``throw`` is replaced by ``cuda::std::terminate()`` call.                       +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_FLOAT128_SUPPORT                     | Disables support for ``__float128`` type.                                                                          +
+| CCCL_DISABLE_FLOAT128_SUPPORT                     | Disables use and library support for ``__float128`` type.                                                                          +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_FP16_SUPPORT                         | Disables support for ``__half`` type.                                                                              +
+| CCCL_DISABLE_FP16_SUPPORT                         | Disables use and library support for ``__half`` type.                                                                              +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_INT128_SUPPORT                       | Disables support for ``__int128`` type.                                                                            +
+| CCCL_DISABLE_INT128_SUPPORT                       | Disables use and library support for ``__int128`` type.                                                                            +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_NVFP4_SUPPORT                        | Disables support for ``__nv_fp4_eNmM`` types.                                                                      +
+| CCCL_DISABLE_NVFP4_SUPPORT                        | Disables use and library support for ``__nv_fp4_eNmM`` types.                                                                      +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_NVFP6_SUPPORT                        | Disables support for ``__nv_fp6_eNmM`` types.                                                                      +
+| CCCL_DISABLE_NVFP6_SUPPORT                        | Disables use and library support for ``__nv_fp6_eNmM`` types.                                                                      +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_NVFP8_SUPPORT                        | Disables support for ``__nv_fp8_eNmM`` types.                                                                      +
+| CCCL_DISABLE_NVFP8_SUPPORT                        | Disables use and library support for ``__nv_fp8_eNmM`` types.                                                                      +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_PDL                                  | Disables Programmatic Dependent Launch.                                                                            +
+| CCCL_DISABLE_PDL                                  | Disables use of Programmatic Dependent Launch.                                                                     +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_DISABLE_RTTI                                 | Disables support for runtime type information.                                                                     +
+| CCCL_DISABLE_RTTI                                 | Disables use of for runtime type information.                                                                     +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 | CCCL_ENABLE_ASSERTIONS                            | Enables assertions in both host and device code.                                                                   +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
@@ -50,7 +50,7 @@ The CUDA Core Compute Libraries provide set of macros to enable or disable speci
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 | CCCL_ENABLE_HOST_ASSERTIONS                       | Enables assertions in host code exclusively.                                                                       +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
-| CCCL_ENABLE_OPTIONAL_REF                          | Enables ``optional<T&>`` as defined in P2988R8.                                                                    +
+| CCCL_ENABLE_OPTIONAL_REF                          | Enables ``optional<T&>`` as defined by P2988R8.                                                                    +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 | CCCL_GCC_HAS_EXTENDED_NUMERIC_LITERALS            | Informs that ``-fext-numeric-literals`` were enabled with GCC. This is necessary to enable ``__float128`` support. +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
@@ -68,3 +68,6 @@ The CUDA Core Compute Libraries provide set of macros to enable or disable speci
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
 | CCCL_IGNORE_MSVC_TRADITIONAL_PREPROCESSOR_WARNING | Disables diagnostics emitted when using MSVC's traditional preprocessor.                                           +
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------+
+
+.. note::
+    ``<cuda_fpN.h>`` headers contain dependencies on other ``<cuda_fpM.h>`` headers, thus for example defining ``CCCL_DISABLE_BF16_SUPPORT`` will cause that support for NVIDIA 8-bit, 6-bit and 4-bit floating point types is disabled, too.
