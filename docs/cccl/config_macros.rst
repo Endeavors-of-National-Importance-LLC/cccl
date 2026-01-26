@@ -32,6 +32,8 @@ The CUDA Core Compute Libraries provide set of macros to enable or disable speci
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
 | CCCL_DISABLE_INT128_SUPPORT                       | Disables use and library support for ``__int128`` type.                                                                                                |
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
+| CCCL_DISABLE_LONG_DOUBLE_SUPPORT                  | Disables use and library support for ``long double`` type.                                                                                             |
++---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
 | CCCL_DISABLE_NVFP4_SUPPORT                        | Disables use and library support for ``__nv_fp4_eNmM`` types. Also disables support for smaller NV floating point types.                               |
 +---------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
 | CCCL_DISABLE_NVFP6_SUPPORT                        | Disables use and library support for ``__nv_fp6_eNmM`` types. Also disables support for smaller NV floating point types.                               |
