@@ -9,9 +9,8 @@ import sys
 
 import jsondiff
 import tabulate
-from colorama import Fore
-
 import utils
+from colorama import Fore
 
 
 # Parse version string into tuple, "x.y.z" -> (x, y, z)

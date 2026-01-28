@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """
 Compare Python cuda.compute vs C++ CCCL performance.
 Shows overhead and percentage differences.
@@ -10,7 +11,6 @@ import sys
 from pathlib import Path
 
 import tabulate
-
 import utils
 
 
