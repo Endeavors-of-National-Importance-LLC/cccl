@@ -24,9 +24,14 @@ def extract_measurements(results):
                 continue
 
             # Get axis values
+            # Normalize axis names by removing nvbench tags like {io}, {ct}
             axes = {}
             for ax in state.get("axis_values", []):
-                axes[ax["name"]] = ax["value"]
+                name = ax["name"]
+                # Remove nvbench tags: Elements{io} → Elements, T{ct} → T
+                if "{" in name:
+                    name = name.split("{")[0]
+                axes[name] = ax["value"]
 
             # Get GPU and CPU time from summaries
             gpu_time = None
@@ -148,96 +153,125 @@ def main():
             m for m in cpp_measurements if m["device"] == device_id
         ]
 
-        # Group by element size
-        element_sizes = sorted(
-            set(int(m["axes"].get("Elements", 0)) for m in py_device_measurements)
-        )
+        # Get unique types (if present)
+        types = sorted(set(m["axes"].get("T", "") for m in py_device_measurements))
+        has_types = any(types)
 
-        # Build table data with CPU time for interpreter overhead
-        table_data = []
-        headers = [
-            "Elements",
-            "C++ GPU",
-            "Py GPU",
-            "% Slower",
-            "C++ CPU",
-            "Py CPU",
-            "CPU Ovhd",
+        # Group by type (if multi-type benchmark) or just element size
+        if has_types and len(types) > 1:
+            # Multi-type benchmark: show separate table per type
+            for type_str in types:
+                if not type_str:
+                    continue
+
+                print(f"### Type: {type_str}\n")
+
+                py_type_measurements = [
+                    m for m in py_device_measurements if m["axes"].get("T") == type_str
+                ]
+                cpp_type_measurements = [
+                    m for m in cpp_device_measurements if m["axes"].get("T") == type_str
+                ]
+
+                _print_comparison_table(py_type_measurements, cpp_type_measurements)
+                print()
+        else:
+            # Single-type or no type axis: show one table
+            _print_comparison_table(py_device_measurements, cpp_device_measurements)
+            print()
+
+
+def _print_comparison_table(py_measurements, cpp_measurements):
+    """Print comparison table for given measurements."""
+    # Group by element size
+    element_sizes = sorted(
+        set(int(m["axes"].get("Elements", 0)) for m in py_measurements)
+    )
+
+    # Build table data with CPU time for interpreter overhead
+    table_data = []
+    headers = [
+        "Elements",
+        "C++ GPU",
+        "Py GPU",
+        "% Slower",
+        "C++ CPU",
+        "Py CPU",
+        "CPU Ovhd",
+    ]
+
+    for size in element_sizes:
+        py_times = [
+            m["gpu_time"]
+            for m in py_measurements
+            if int(m["axes"].get("Elements", 0)) == size
+        ]
+        cpp_times = [
+            m["gpu_time"]
+            for m in cpp_measurements
+            if int(m["axes"].get("Elements", 0)) == size
         ]
 
-        for size in element_sizes:
-            py_times = [
-                m["gpu_time"]
-                for m in py_device_measurements
-                if int(m["axes"].get("Elements", 0)) == size
-            ]
-            cpp_times = [
-                m["gpu_time"]
-                for m in cpp_device_measurements
-                if int(m["axes"].get("Elements", 0)) == size
-            ]
+        py_cpu_times = [
+            m["cpu_time"]
+            for m in py_measurements
+            if int(m["axes"].get("Elements", 0)) == size
+            and m.get("cpu_time") is not None
+        ]
+        cpp_cpu_times = [
+            m["cpu_time"]
+            for m in cpp_measurements
+            if int(m["axes"].get("Elements", 0)) == size
+            and m.get("cpu_time") is not None
+        ]
 
-            py_cpu_times = [
-                m["cpu_time"]
-                for m in py_device_measurements
-                if int(m["axes"].get("Elements", 0)) == size
-                and m.get("cpu_time") is not None
-            ]
-            cpp_cpu_times = [
-                m["cpu_time"]
-                for m in cpp_device_measurements
-                if int(m["axes"].get("Elements", 0)) == size
-                and m.get("cpu_time") is not None
-            ]
+        if not py_times or not cpp_times:
+            continue
 
-            if not py_times or not cpp_times:
-                continue
+        # Average if multiple measurements
+        py_avg = sum(py_times) / len(py_times)
+        cpp_avg = sum(cpp_times) / len(cpp_times)
 
-            # Average if multiple measurements
-            py_avg = sum(py_times) / len(py_times)
-            cpp_avg = sum(cpp_times) / len(cpp_times)
+        overhead = py_avg - cpp_avg
+        pct_slower = (overhead / cpp_avg) * 100.0
 
-            overhead = py_avg - cpp_avg
-            pct_slower = (overhead / cpp_avg) * 100.0
+        # Format element size as power of 2
+        log2_size = int(math.log2(size))
+        size_str = f"2^{log2_size}"
 
-            # Format element size as power of 2
-            log2_size = int(math.log2(size))
-            size_str = f"2^{log2_size}"
+        if py_cpu_times and cpp_cpu_times:
+            # Show CPU time comparison for Python interpreter overhead
+            py_cpu_avg = sum(py_cpu_times) / len(py_cpu_times)
+            cpp_cpu_avg = sum(cpp_cpu_times) / len(cpp_cpu_times)
+            cpu_overhead = py_cpu_avg - cpp_cpu_avg
 
-            if py_cpu_times and cpp_cpu_times:
-                # Show CPU time comparison for Python interpreter overhead
-                py_cpu_avg = sum(py_cpu_times) / len(py_cpu_times)
-                cpp_cpu_avg = sum(cpp_cpu_times) / len(cpp_cpu_times)
-                cpu_overhead = py_cpu_avg - cpp_cpu_avg
+            table_data.append(
+                [
+                    size_str,
+                    format_duration(cpp_avg),
+                    format_duration(py_avg),
+                    format_percentage(pct_slower / 100.0),
+                    format_duration(cpp_cpu_avg),
+                    format_duration(py_cpu_avg),
+                    format_duration(cpu_overhead),
+                ]
+            )
+        else:
+            # Fallback if CPU times not available
+            table_data.append(
+                [
+                    size_str,
+                    format_duration(cpp_avg),
+                    format_duration(py_avg),
+                    format_percentage(pct_slower / 100.0),
+                    "N/A",
+                    "N/A",
+                    "N/A",
+                ]
+            )
 
-                table_data.append(
-                    [
-                        size_str,
-                        format_duration(cpp_avg),
-                        format_duration(py_avg),
-                        format_percentage(pct_slower / 100.0),
-                        format_duration(cpp_cpu_avg),
-                        format_duration(py_cpu_avg),
-                        format_duration(cpu_overhead),
-                    ]
-                )
-            else:
-                # Fallback if CPU times not available
-                table_data.append(
-                    [
-                        size_str,
-                        format_duration(cpp_avg),
-                        format_duration(py_avg),
-                        format_percentage(pct_slower / 100.0),
-                        "N/A",
-                        "N/A",
-                        "N/A",
-                    ]
-                )
-
-        # Print table using tabulate
-        print(tabulate.tabulate(table_data, headers=headers, tablefmt="github"))
-        print()
+    # Print table using tabulate
+    print(tabulate.tabulate(table_data, headers=headers, tablefmt="github"))
 
 
 if __name__ == "__main__":
