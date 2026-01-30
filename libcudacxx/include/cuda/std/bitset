@@ -645,21 +645,6 @@ template <size_t _Size>
 struct hash<bitset<_Size>>;
 
 template <size_t _Size>
-_CCCL_API constexpr void __throw_if_out_of_range(size_t __pos, const char* __msg)
-{
-  if (__pos >= _Size)
-  {
-    _CCCL_THROW(std::out_of_range, __msg);
-  }
-}
-
-template <>
-_CCCL_API inline void __throw_if_out_of_range<0>(size_t, const char* __msg)
-{
-  _CCCL_THROW(std::out_of_range, __msg);
-}
-
-template <size_t _Size>
 class _CCCL_TYPE_VISIBILITY_DEFAULT bitset : private __bitset<_Size == 0 ? 0 : (_Size - 1) / 32 + 1, _Size>
 {
 public:
@@ -758,8 +743,13 @@ public:
 
   _CCCL_API constexpr bitset& set(size_t __pos, bool __val = true)
   {
-    ::cuda::std::__throw_if_out_of_range<_Size>(__pos, "bitset set argument out of range");
-
+    if constexpr (_Size > 0)
+    {
+      if (__pos >= _Size)
+      {
+        _CCCL_THROW(std::out_of_range, "bitset set argument out of range");
+      }
+    }
     (*this)[__pos] = __val;
     return *this;
   }
@@ -772,8 +762,13 @@ public:
 
   _CCCL_API constexpr bitset& reset(size_t __pos)
   {
-    ::cuda::std::__throw_if_out_of_range<_Size>(__pos, "bitset reset argument out of range");
-
+    if constexpr (_Size > 0)
+    {
+      if (__pos >= _Size)
+      {
+        _CCCL_THROW(std::out_of_range, "bitset reset argument out of range");
+      }
+    }
     (*this)[__pos] = false;
     return *this;
   }
@@ -793,8 +788,13 @@ public:
 
   _CCCL_API constexpr bitset& flip(size_t __pos)
   {
-    ::cuda::std::__throw_if_out_of_range<_Size>(__pos, "bitset flip argument out of range");
-
+    if constexpr (_Size > 0)
+    {
+      if (__pos >= _Size)
+      {
+        _CCCL_THROW(std::out_of_range, "bitset flip argument out of range");
+      }
+    }
     reference __r = base::__make_ref(__pos);
     __r           = ~__r;
     return *this;
@@ -877,8 +877,13 @@ public:
 
   _CCCL_API constexpr bool test(size_t __pos) const
   {
-    ::cuda::std::__throw_if_out_of_range<_Size>(__pos, "bitset test argument out of range");
-
+    if constexpr (_Size > 0)
+    {
+      if (__pos >= _Size)
+      {
+        _CCCL_THROW(std::out_of_range, "bitset test argument out of range");
+      }
+    }
     return (*this)[__pos];
   }
 
