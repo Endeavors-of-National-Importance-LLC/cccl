@@ -743,12 +743,9 @@ public:
 
   _CCCL_API constexpr bitset& set(size_t __pos, bool __val = true)
   {
-    if constexpr (_Size > 0)
+    if (__pos >= _Size)
     {
-      if (__pos >= _Size)
-      {
-        _CCCL_THROW(std::out_of_range, "bitset set argument out of range");
-      }
+      _CCCL_THROW(std::out_of_range, "bitset set argument out of range");
     }
     (*this)[__pos] = __val;
     return *this;
@@ -762,12 +759,9 @@ public:
 
   _CCCL_API constexpr bitset& reset(size_t __pos)
   {
-    if constexpr (_Size > 0)
+    if (__pos >= _Size)
     {
-      if (__pos >= _Size)
-      {
-        _CCCL_THROW(std::out_of_range, "bitset reset argument out of range");
-      }
+      _CCCL_THROW(std::out_of_range, "bitset reset argument out of range");
     }
     (*this)[__pos] = false;
     return *this;
@@ -788,12 +782,9 @@ public:
 
   _CCCL_API constexpr bitset& flip(size_t __pos)
   {
-    if constexpr (_Size > 0)
+    if (__pos >= _Size)
     {
-      if (__pos >= _Size)
-      {
-        _CCCL_THROW(std::out_of_range, "bitset flip argument out of range");
-      }
+      _CCCL_THROW(std::out_of_range, "bitset flip argument out of range");
     }
     reference __r = base::__make_ref(__pos);
     __r           = ~__r;
@@ -877,12 +868,9 @@ public:
 
   _CCCL_API constexpr bool test(size_t __pos) const
   {
-    if constexpr (_Size > 0)
+    if (__pos >= _Size)
     {
-      if (__pos >= _Size)
-      {
-        _CCCL_THROW(std::out_of_range, "bitset test argument out of range");
-      }
+      _CCCL_THROW(std::out_of_range, "bitset test argument out of range");
     }
     return (*this)[__pos];
   }
