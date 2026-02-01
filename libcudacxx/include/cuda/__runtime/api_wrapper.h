@@ -47,7 +47,7 @@
     _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
   } while (0)
 
-#define _CCCL_TERMINATE_CUDA_API(_NAME, _MSG, ...)                                 \
+#define _CCCL_ABORT_CUDA_API(_NAME, _MSG, ...)                                     \
   do                                                                               \
   {                                                                                \
     [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__);            \

@@ -32,6 +32,7 @@
 #include <cuda/std/__host_stdlib/stdexcept>
 #include <cuda/std/__string/char_traits.h>
 #include <cuda/std/__type_traits/is_char_like_type.h>
+#include <cuda/std/__utility/cmp.h>
 #include <cuda/std/climits>
 #include <cuda/std/cstddef>
 #include <cuda/std/string_view>
@@ -743,7 +744,7 @@ public:
 
   _CCCL_API constexpr bitset& set(size_t __pos, bool __val = true)
   {
-    if (__pos >= _Size)
+    if (::cuda::std::cmp_greater_equal(__pos, _Size))
     {
       _CCCL_THROW(std::out_of_range, "bitset set argument out of range");
     }
@@ -759,7 +760,7 @@ public:
 
   _CCCL_API constexpr bitset& reset(size_t __pos)
   {
-    if (__pos >= _Size)
+    if (::cuda::std::cmp_greater_equal(__pos, _Size))
     {
       _CCCL_THROW(std::out_of_range, "bitset reset argument out of range");
     }
@@ -782,7 +783,7 @@ public:
 
   _CCCL_API constexpr bitset& flip(size_t __pos)
   {
-    if (__pos >= _Size)
+    if (::cuda::std::cmp_greater_equal(__pos, _Size))
     {
       _CCCL_THROW(std::out_of_range, "bitset flip argument out of range");
     }
@@ -868,7 +869,7 @@ public:
 
   _CCCL_API constexpr bool test(size_t __pos) const
   {
-    if (__pos >= _Size)
+    if (::cuda::std::cmp_greater_equal(__pos, _Size))
     {
       _CCCL_THROW(std::out_of_range, "bitset test argument out of range");
     }
