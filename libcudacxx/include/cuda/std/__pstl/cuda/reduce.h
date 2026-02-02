@@ -131,8 +131,16 @@ struct __pstl_dispatch<__pstl_algorithm::__reduce, __execution_backend::__cuda>
     void* __temp_storage   = nullptr;
     size_t __num_bytes     = 0;
     const auto __num_items = ::cuda::std::distance(__first, __last);
-    ::cub::DeviceReduce::Reduce(
-      __temp_storage, __num_bytes, __first, static_cast<_Tp*>(nullptr), __num_items, __func, __init);
+    _CCCL_TRY_CUDA_API(
+      ::cub::DeviceReduce::Reduce,
+      "__pstl_cuda_reduce: determining temporary storage failed",
+      __temp_storage,
+      __num_bytes,
+      __first,
+      static_cast<_Tp*>(nullptr),
+      __num_items,
+      __func,
+      __init);
 
     // Allocate memory for result
     auto __stream   = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStreamPerThread}, __policy);
@@ -143,7 +151,9 @@ struct __pstl_dispatch<__pstl_algorithm::__reduce, __execution_backend::__cuda>
       __allocation_guard<_Tp, _AccumT, decltype(__resource)> __guard{__stream, __resource, __num_bytes};
 
       // Run the reduction
-      ::cub::DeviceReduce::Reduce(
+      _CCCL_TRY_CUDA_API(
+        ::cub::DeviceReduce::Reduce,
+        "__pstl_cuda_reduce: call to cub device_reduce failes",
         __guard.__get_temp_storage(),
         __num_bytes,
         ::cuda::std::move(__first),
