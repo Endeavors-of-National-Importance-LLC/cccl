@@ -114,7 +114,6 @@ def bench_triad(state: bench.State):
     """
 
     # Get parameters from axes
-    launch.get_stream()
     type_str = state.get_string("T")
     dtype = TYPE_MAP[type_str]
     size = state.get_int64("Elements")
@@ -167,8 +166,7 @@ def bench_nstream(state: bench.State):
     zip_in = ZipIterator(a, b, c)
 
     def nstream_op(abc):
-        ai, bi, ci = abc
-        return ai + bi + scalar * ci
+        return abc[0] + abc[1] + scalar * abc[2]
 
     transform = cuda.compute.make_unary_transform(zip_in, a, nstream_op)
 

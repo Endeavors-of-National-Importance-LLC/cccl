@@ -16,6 +16,7 @@ import numpy as np
 import cuda.bench as bench
 import cuda.compute
 from cuda.compute import ConstantIterator
+from cuda.compute import OpKind
 
 from utils import as_cupy_stream
 
@@ -48,10 +49,7 @@ def bench_fill(state: bench.State):
     constant_it = ConstantIterator(dtype(42))
 
     # Build transform operation: ConstantIterator -> output
-    def identity(x):
-        return x
-
-    transform = cuda.compute.make_unary_transform(constant_it, out, identity)
+    transform = cuda.compute.make_unary_transform(constant_it, out, OpKind.IDENTITY)
 
     # Match C++ metrics
     state.add_element_count(size)
