@@ -148,7 +148,7 @@ mkdir -p "$RESULTS_DIR"
 if [[ "$RUN_CPP" == true ]]; then
     if [[ ! -d "$CUB_BENCH_DIR" ]]; then
         error_exit "C++ benchmark directory not found: $CUB_BENCH_DIR
-        
+
 Please build C++ benchmarks first:
   cd $CCCL_ROOT
   ./ci/build_cub.sh -arch <your_gpu_arch>  # e.g., 89 for RTX 4090"
@@ -163,7 +163,7 @@ cd "$SCRIPT_DIR"
 
 for bench in "${BENCHMARKS_TO_RUN[@]}"; do
     print_section "Benchmark: $bench"
-    
+
     # Map benchmark name to C++ binary and Python script
     case "$bench" in
         fill)
@@ -184,40 +184,40 @@ for bench in "${BENCHMARKS_TO_RUN[@]}"; do
             continue
             ;;
     esac
-    
+
     CPP_RESULT="$RESULTS_DIR/${bench}_cpp.json"
     PY_RESULT="$RESULTS_DIR/${bench}_py.json"
-    
+
     # Run C++ benchmark
     if [[ "$RUN_CPP" == true ]]; then
         echo "Running C++ benchmark: $CPP_BINARY"
-        
+
         CPP_BIN="$CUB_BENCH_DIR/$CPP_BINARY"
-        
+
         if [[ ! -f "$CPP_BIN" ]]; then
             echo "WARNING: C++ binary not found: $CPP_BIN"
             echo "Available benchmarks:"
             ls "$CUB_BENCH_DIR"/*.base 2>/dev/null | head -10 || echo "  (none found)"
             continue
         fi
-        
+
         "$CPP_BIN" --json "$CPP_RESULT" --devices "$DEVICE"
         echo "  ✓ C++ results: $CPP_RESULT"
     fi
-    
+
     # Run Python benchmark
     if [[ "$RUN_PY" == true ]]; then
         echo "Running Python benchmark: $PY_SCRIPT"
-        
+
         if [[ ! -f "$PY_SCRIPT" ]]; then
             echo "WARNING: Python script not found: $PY_SCRIPT"
             continue
         fi
-        
+
         python "$PY_SCRIPT" --json "$PY_RESULT" --devices "$DEVICE"
         echo "  ✓ Python results: $PY_RESULT"
     fi
-    
+
     echo ""
 done
 

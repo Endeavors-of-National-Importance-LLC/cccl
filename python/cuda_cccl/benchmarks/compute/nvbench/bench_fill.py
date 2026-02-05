@@ -12,14 +12,11 @@ import sys
 
 import cupy as cp
 import numpy as np
+from utils import as_cupy_stream
 
 import cuda.bench as bench
 import cuda.compute
-from cuda.compute import ConstantIterator
-from cuda.compute import OpKind
-
-from utils import as_cupy_stream
-
+from cuda.compute import ConstantIterator, OpKind
 
 # Type mapping: C++ types to NumPy dtypes
 TYPE_MAP = {

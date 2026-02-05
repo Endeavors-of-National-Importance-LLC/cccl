@@ -13,12 +13,10 @@ import cupy as cp
 import numba
 import numpy as np
 from numba import cuda as lang
+from utils import as_cupy_stream
 
 import cuda.bench as bench
 import cuda.compute
-
-from utils import as_cupy_stream
-
 
 HEAVINESS_VALUES = (32, 64, 128, 256)
 

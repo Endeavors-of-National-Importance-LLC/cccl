@@ -12,13 +12,11 @@ import sys
 
 import cupy as cp
 import numpy as np
+from utils import as_cupy_stream
 
 import cuda.bench as bench
 import cuda.compute
 from cuda.compute import ZipIterator
-
-from utils import as_cupy_stream
-
 
 # Type mapping: C++ types to NumPy dtypes
 TYPE_MAP = {

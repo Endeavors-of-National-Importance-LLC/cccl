@@ -614,9 +614,9 @@ Supported benchmarks: %(benchmarks)s
                 continue
 
             output_path = args.results_dir / f"{bench}_comparison.txt"
-            print(f"=" * 72)
+            print("=" * 72)
             print(f"Benchmark: {bench}")
-            print(f"=" * 72)
+            print("=" * 72)
             print()
 
             if compare_benchmark(py_path, cpp_path, args.device, output_path):
