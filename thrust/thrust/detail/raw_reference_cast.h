@@ -156,6 +156,7 @@ _CCCL_HOST_DEVICE typename detail::raw_reference<T>::type raw_reference_cast(T&&
   return t;
 }
 
+_CCCL_EXEC_CHECK_DISABLE
 template <typename... Ts>
 _CCCL_HOST_DEVICE auto raw_reference_cast(detail::tuple_of_iterator_references<Ts...> t) ->
   typename detail::raw_reference<detail::tuple_of_iterator_references<Ts...>>::type
